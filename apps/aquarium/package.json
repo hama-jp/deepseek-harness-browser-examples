@@ -1,0 +1,14 @@
+{
+  "name": "deepseek-harness-aquascape",
+  "version": "1.0.0",
+  "description": "Build the standalone Aquascape browser example",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "esbuild": "^0.20.2",
+    "three": "^0.160.0"
+  },
+  "private": true
+}

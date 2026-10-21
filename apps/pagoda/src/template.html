@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sakura Pagoda — A Voxel Garden</title>
+<style>
+  :root{
+    --ink:#f7efe2;
+    --muted:rgba(247,239,226,.62);
+    --gold:#e8c27a;
+    --glass:rgba(20,24,28,.38);
+    --line:rgba(255,244,224,.18);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0;overflow:hidden;background:#0c1014}
+  body{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    color:var(--ink);
+  }
+  #scene{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none;filter:saturate(1.18) contrast(1.05) brightness(1.02)}
+  .vignette{
+    position:fixed;inset:0;pointer-events:none;z-index:2;
+    background:
+      radial-gradient(ellipse 82% 72% at 50% 46%, transparent 48%, rgba(8,10,14,.18) 80%, rgba(6,8,12,.42) 100%),
+      linear-gradient(to bottom, rgba(10,12,18,.16) 0%, transparent 18%, transparent 80%, rgba(8,9,12,.30) 100%);
+    mix-blend-mode:multiply;
+  }
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+  }
+  #ui{position:fixed;inset:0;z-index:4;pointer-events:none}
+  .title{
+    position:absolute;top:clamp(22px,4vh,46px);left:clamp(22px,4vw,58px);
+    padding-left:18px;border-left:1px solid rgba(232,194,122,.65);
+    text-shadow:0 2px 26px rgba(0,0,0,.55);
+  }
+  .title .eyebrow{
+    font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);
+    margin:0 0 10px;opacity:.92;
+  }
+  .title h1{
+    margin:0;font-weight:400;font-size:clamp(30px,4.2vw,58px);letter-spacing:.06em;line-height:1;
+  }
+  .title h1 em{font-style:normal;color:#ffd9e6;text-shadow:0 0 30px rgba(255,170,205,.28)}
+  .title .jp{
+    margin:9px 0 0;font-size:clamp(12px,1.35vw,17px);letter-spacing:.42em;color:rgba(255,235,240,.72);
+    font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  }
+  .title .sub{
+    margin:12px 0 0;font-size:11.5px;letter-spacing:.16em;color:var(--muted);
+    font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  .panel{
+    position:absolute;left:clamp(22px,4vw,58px);bottom:clamp(22px,4vh,42px);
+    display:flex;flex-direction:column;gap:10px;pointer-events:auto;
+  }
+  .hint{
+    display:flex;gap:18px;align-items:center;font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(247,239,226,.54);
+    padding:0 2px;
+  }
+  .hint b{font-weight:500;color:rgba(247,239,226,.78)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  button.ctl{
+    appearance:none;border:1px solid var(--line);background:var(--glass);
+    color:var(--ink);padding:9px 15px;border-radius:2px;cursor:pointer;
+    min-height:44px;min-width:44px;
+    font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:10px;letter-spacing:.19em;text-transform:uppercase;
+    backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+    transition:background .3s,border-color .3s,color .3s,transform .2s;
+  }
+  button.ctl:hover{background:rgba(42,47,52,.55);border-color:rgba(232,194,122,.55);transform:translateY(-1px)}
+  button.ctl:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  button.ctl[aria-pressed="true"]{border-color:rgba(232,194,122,.72);color:#ffe6b7;background:rgba(70,55,34,.42)}
+  button.ctl .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-right:7px;vertical-align:1px;box-shadow:0 0 7px rgba(232,194,122,.9)}
+  .credit{
+    position:absolute;right:clamp(22px,4vw,58px);bottom:clamp(22px,4vh,42px);
+    font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;font-size:9.5px;
+    letter-spacing:.22em;text-transform:uppercase;color:rgba(247,239,226,.35);text-align:right;
+    line-height:1.8;pointer-events:none;
+  }
+  .compass{
+    position:absolute;right:clamp(22px,4vw,58px);top:clamp(22px,4vh,46px);
+    width:64px;height:64px;opacity:.52;pointer-events:none;
+    filter:drop-shadow(0 0 12px rgba(0,0,0,.4));
+  }
+  #loading{
+    position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;background:
+      radial-gradient(ellipse at 50% 60%, #263029 0%, #12181c 45%, #0a0d11 100%);
+    transition:opacity 1.1s ease, visibility 1.1s;
+  }
+  #loading.hide{opacity:0;visibility:hidden}
+  #loading .mark{font-size:42px;color:#ffd9e6;letter-spacing:.16em;text-shadow:0 0 44px rgba(255,160,200,.32)}
+  #loading .jp{margin-top:12px;font-size:12px;letter-spacing:.55em;color:rgba(232,194,122,.8)}
+  #loading .bar{
+    width:min(280px,58vw);height:1px;margin-top:34px;background:rgba(255,240,220,.13);overflow:hidden;
+  }
+  #loading .bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,transparent,#e8c27a,transparent);animation:load 1.6s ease-in-out infinite}
+  #loading .status{margin-top:14px;font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:rgba(247,239,226,.45)}
+  @keyframes load{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
+  .fade-in{animation:fade 2.2s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+  #webglFallback{
+    position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+    padding:24px;background:radial-gradient(ellipse at 50% 45%,#263029 0%,#12181c 48%,#0a0d11 100%);
+  }
+  #webglFallback.show{display:flex}
+  .fallback-card{
+    max-width:480px;padding:28px 26px;border:1px solid rgba(232,194,122,.35);
+    background:rgba(12,16,20,.78);box-shadow:0 18px 60px rgba(0,0,0,.35);
+  }
+  .fallback-card .mark{font-size:26px;color:#ffd9e6;letter-spacing:.14em;margin-bottom:12px}
+  .fallback-card h2{margin:0 0 12px;font-weight:400;font-size:clamp(22px,4vw,30px);line-height:1.2}
+  .fallback-card p{margin:0 0 12px;font-family:"Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:13px;line-height:1.7;color:rgba(247,239,226,.78)}
+  .fallback-card p:last-child{margin-bottom:0;color:rgba(247,239,226,.55)}
+  @media (max-width:720px){
+    .title .sub{display:none}
+    .hint{display:none}
+    .credit{display:none}
+    .compass{width:48px;height:48px}
+    button.ctl{padding:7px 9px;font-size:10px;letter-spacing:.1em;min-height:44px}
+    .panel{left:18px;right:18px;bottom:18px}
+    .controls{gap:8px}
+    .controls button.ctl{flex:1 1 auto}
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="A voxel art pagoda in a Japanese garden"></canvas>
+<div class="vignette"></div>
+<div class="grain"></div>
+
+<div id="ui">
+  <header class="title fade-in">
+    <p class="eyebrow">A hand-built voxel landscape</p>
+    <h1>Sakura <em>Pagoda</em></h1>
+    <p class="jp">桜塔の庭</p>
+    <p class="sub">Five eaves above a quiet pond · 1,000 blossoms in the wind</p>
+  </header>
+
+  <svg class="compass" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <circle cx="32" cy="32" r="26" stroke="rgba(247,239,226,.28)" stroke-width=".8"/>
+    <circle cx="32" cy="32" r="21" stroke="rgba(232,194,122,.35)" stroke-width=".5" stroke-dasharray="1 3"/>
+    <path d="M32 9 L36 30 L32 32 L28 30 Z" fill="rgba(232,194,122,.8)"/>
+    <path d="M32 55 L29 34 L32 32 L35 34 Z" fill="rgba(247,239,226,.22)"/>
+    <circle cx="32" cy="32" r="1.6" fill="#f7efe2"/>
+    <text x="32" y="7" text-anchor="middle" fill="rgba(247,239,226,.6)" font-size="5" font-family="Georgia,serif">N</text>
+  </svg>
+
+  <div class="panel fade-in">
+    <div class="controls">
+      <button class="ctl" id="btnOrbit" aria-pressed="true"><span class="dot"></span>Cinematic orbit</button>
+      <button class="ctl" id="btnPause" aria-pressed="false">Pause scene</button>
+      <button class="ctl" id="btnNight" aria-pressed="false">Golden hour</button>
+    </div>
+    <div class="hint"><span><b>Drag</b> to orbit</span><span><b>Scroll</b> to zoom</span><span><b>Right-drag</b> to pan</span></div>
+    <div class="sr-only" id="sceneStatus" aria-live="polite"></div>
+  </div>
+
+  <div class="credit">Voxel garden ·<br>built in one HTML file</div>
+</div>
+
+<div id="loading">
+  <div class="mark">桜塔</div>
+  <div class="jp">SAKURA PAGODA</div>
+  <div class="bar"><i></i></div>
+  <div class="status" id="loadStatus">Planting the garden…</div>
+</div>
+
+<div id="webglFallback" role="alert">
+  <div class="fallback-card">
+    <div class="mark">桜塔</div>
+    <h2>This garden needs WebGL</h2>
+    <p>Your browser could not start a WebGL graphics context, so the 3D pagoda and garden cannot be displayed here.</p>
+    <p>Try enabling hardware acceleration or opening this page in a current version of Chrome, Edge, Firefox or Safari.</p>
+  </div>
+</div>
+
+<script>/*__THREE__*/</script>
+<script>/*__APP__*/</script>
+
+<!--
+Three.js is distributed under the MIT License.
+
+The MIT License
+
+Copyright © 2010-2023 three.js authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+</body>
+</html>

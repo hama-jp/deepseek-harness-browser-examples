@@ -1,0 +1,1 @@
+Create a simple Excel-like spreadsheet application that runs in the browser. Support cell editing, formulas with cell references and SUM/AVERAGE, range selection, copy/paste, undo/redo, basic formatting, and saving/loading data. Make it polished and easy to use. Deliver a single self-contained index.html file that can be opened in Chrome.

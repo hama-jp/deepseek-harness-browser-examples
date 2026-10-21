@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "model": {
+    "name": "DeepSeek-V4.1-Flash-1017",
+    "quantization": "EXL3 EAQ v1 2.9 bpw",
+    "weights_revision": "45ee5d0fd106c94a3d77f721e09cbb2f50e5a16b",
+    "recipe_revision": "31eea4608f8bb292a92e2f7a1db400e928620c78",
+    "runtime": "TensorFold",
+    "runtime_revision": "629c524a0ea57512a5342abb498d1b7c25353343",
+    "hardware": "2 × NVIDIA DGX Spark (GB10)",
+    "abliteration": false
+  },
+  "harness": {
+    "name": "DeepSeek Harness",
+    "version": "0.2.1-rc.2",
+    "reasoning_effort": "high",
+    "context_tokens": 262144,
+    "task_max_output_tokens": 131072,
+    "parallel_inference_requests": 1,
+    "normal_compaction_and_pruning": true,
+    "browser_tool": "Playwright MCP",
+    "subagents": false,
+    "web_search_tool": false,
+    "automatic_goal_loop": false
+  },
+  "interpretation": "One creative run per initial task; assisted public revisions are recorded separately. This collection is not a comparative benchmark. Original captures and unmodified originals are retained privately. Raw SDK traces and machine-specific configuration are not part of this public repository.",
+  "tasks": {
+    "spreadsheet": {
+      "initial_time_limit_seconds": 7200,
+      "initial_elapsed_seconds": 4726.150920152664,
+      "initial_result": "self-finished",
+      "initial_prompt": "prompts/spreadsheet.txt",
+      "initial_sha256": "31848a07126ae8644b67474f5681ddcca4a9ba3f9676360b327debe7f96cb552",
+      "initial_operational_resumes": 0,
+      "initial_ended_at": "2026-10-21T16:33:32+0900",
+      "final_sha256": "3a265323a7e6f58638d36c91561e08be9965cca55e223c211d793e8e5814e39a",
+      "published_file": "apps/spreadsheet/index.html"
+    },
+    "aquarium": {
+      "initial_time_limit_seconds": 7200,
+      "initial_elapsed_seconds": 4894.92032289505,
+      "initial_result": "self-finished",
+      "initial_prompt": "prompts/aquarium.txt",
+      "initial_sha256": "f60e744a33bc0c3e02d2f07850b9fcd5a8507c95d246006c3ee9dd364f54614c",
+      "initial_operational_resumes": 0,
+      "initial_ended_at": "2026-10-21T14:21:17+0900",
+      "final_sha256": "d850e64c7450f65edae0df2f35ff2dec5927e2a5b29c18367432c889cf4ed6a1",
+      "published_file": "apps/aquarium/index.html"
+    },
+    "pagoda": {
+      "initial_time_limit_seconds": 7200,
+      "initial_elapsed_seconds": 5452.920078754425,
+      "initial_result": "self-finished",
+      "initial_prompt": "prompts/pagoda.txt",
+      "initial_sha256": "d71dfd4f93be3cac973ff7d13cb9155bb1b25aa86fa3707e01232a5f71ba2048",
+      "initial_operational_resumes": 2,
+      "notes": "The initial pagoda task was resumed twice after operational interruptions, within its original two-hour deadline. The output-token cap was increased from 32768 to 131072 during that run. The other tasks started with 131072.",
+      "includes_interruptions": true,
+      "final_sha256": "703b2da72536e2de1b98db80d1481a1aa5a2bb545f60a3290bd98ca3ffa9c87e",
+      "published_file": "apps/pagoda/index.html"
+    },
+    "pinball": {
+      "initial_time_limit_seconds": 7200,
+      "initial_elapsed_seconds": 6545.037709712982,
+      "initial_result": "self-finished",
+      "initial_prompt": "prompts/pinball.txt",
+      "final_sha256": "875e3de0f4e164a817308c6075cb8945b5f8b252e8c85ce0786c647c7280c945",
+      "initial_ended_at": "2026-10-21T20:07:59+0900",
+      "overall_time_limit_relaxed_by_request": true,
+      "assisted_during_initial_run": true,
+      "independent_review_prompts": [
+        "prompts/pinball-review-1.txt",
+        "prompts/pinball-review-2.txt",
+        "prompts/pinball-review-3.txt",
+        "prompts/pinball-review-4.txt"
+      ],
+      "notes": "The user prioritized quality over a two-hour overall limit. Four independent reviews were sent through native Harness steering, including positive verification feedback. The original segment self-finished within its technical limit. The caller did not edit the game implementation.",
+      "published_file": "apps/pinball/index.html"
+    }
+  },
+  "public_revision": {
+    "scope": [
+      "spreadsheet",
+      "aquarium",
+      "pagoda"
+    ],
+    "kind": "Assisted refinement from preserved originals; caller supplied concrete fixes and independently verified the results.",
+    "prompt": "prompts/public-refinement.txt",
+    "time_limit_seconds": 5400,
+    "status": "self-finished",
+    "additional_user_request": "Mouse/arrow formula reference picking, followed by a user-reported stale highlight after committing an in-cell formula",
+    "started_at_epoch": 1792580904.005266,
+    "independent_review_prompts": [
+      "prompts/public-refinement-review-1.txt",
+      "prompts/public-refinement-review-2.txt",
+      "prompts/public-refinement-review-3.txt",
+      "prompts/public-refinement-review-4.txt",
+      "prompts/public-refinement-review-5.txt"
+    ],
+    "elapsed_seconds": 3629.446921348572,
+    "ended_at": "2026-10-21T21:08:53+0900",
+    "deadline_fired": false
+  },
+  "caller_contributions": [
+    "Initial task descriptions and five native steering reviews for the public revision",
+    "Independent browser verification and visual inspection",
+    "Gallery, README, verification records, screenshots and publication packaging",
+    "Aquarium package name/build-script metadata cleanup; dependency versions and all app HTML bytes are retained"
+  ],
+  "independent_verification": {
+    "spreadsheet_checks_passed": 166,
+    "aquarium_checks_passed": 26,
+    "pagoda_checks_passed": 22,
+    "pinball_core_checks_passed": 37,
+    "pinball_actual_window_focus_checks_passed": 8,
+    "pinball_launch_sweep": "4 charge levels, 30 seconds each; normal controls and read-only position observations",
+    "artifact_adoption": "Final frozen bytes match preserved copies used for independent verification; no app implementation edits by the caller",
+    "browser": "Google Chrome 153.0.8010.47 on Linux",
+    "mobile_scope": "Emulated touch viewport, primarily 390x844; not a physical-device compatibility survey",
+    "source_rebuilds": "Both 3D source rebuilds reproduce the accepted HTML SHA-256 exactly; aquarium uses the preserved dependency tree with unchanged lockfile dependency entries."
+  }
+}

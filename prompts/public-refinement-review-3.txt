@@ -1,0 +1,7 @@
+Independent aquarium review of SHA256 3c65c0b62466dd659ab029902ffc5415633cc1cc8d50c0b009c723eb8a4a5763: all 19 main scene checks pass (desktop/phone rendered pause and resume, reduced-motion initial stillness/manual start, 44px controls, zoom allowed, no overflow, no runtime requests/exceptions, readable WebGL fallback). Pause does not add food; keyboard Enter on Feed fish does add meshes. The framing is much more readable on a phone.
+
+Two concrete issues remain before publication:
+1. Paused resize clears the entire aquarium canvas. Repro: load at 1440x900, click Pause scene, resize to 390x844. The button remains Play scene, but all fish/tank scenery disappears and only the background/UI remain. resize() resizes render targets without drawing a replacement still frame. Render the paused scene once after resize, without advancing simulation time or unintentionally resuming. Also check this for pagoda's new pause implementation.
+2. At 390x844 the top-left eyebrow and top-right Interactive scene label overlap. Measured rectangles: eyebrow x36 y22 width316 height10; live label x220 y24 width150 height10. Hide/reposition the duplicate right-hand label on narrow screens and ensure no collision around 320-430px widths.
+
+Please fix these while finishing the outstanding pagoda work and full Three.js license notices. The spreadsheet highlight fix is being independently retested now; preserve its fix while continuing.

@@ -1,0 +1,1 @@
+Create a realistic aquarium simulation using Three.js, with realistic fish swimming naturally and aquatic plants moving naturally in the water. Make it visually rich and detailed. Deliver a single self-contained HTML file that can be opened in Chrome.
