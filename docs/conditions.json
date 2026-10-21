@@ -7,7 +7,7 @@
     "recipe_revision": "31eea4608f8bb292a92e2f7a1db400e928620c78",
     "runtime": "TensorFold",
     "runtime_revision": "629c524a0ea57512a5342abb498d1b7c25353343",
-    "hardware": "2 × NVIDIA DGX Spark (GB10)",
+    "hardware": "2 × NVIDIA GB10 systems: MSI EdgeXpert MS-C931 and ASUS GX10, 128 GB unified memory each",
     "abliteration": false
   },
   "harness": {
